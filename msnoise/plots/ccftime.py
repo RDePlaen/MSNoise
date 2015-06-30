@@ -77,7 +77,6 @@ def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
         ax.fmt_ydata = mdates.DateFormatter('%Y-%m-%d')
         Cursor(ax, useblit=True, color='red', linewidth=1.2)
 
-
         if outfile:
             if outfile.startswith("?"):
                 pair = pair.replace(':','-')

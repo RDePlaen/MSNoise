@@ -122,7 +122,7 @@ def main(stype, interval=1):
     
     maxlag = float(get_config(db, "maxlag"))
     cc_sampling_rate = float(get_config(db, "cc_sampling_rate"))
-    print "stype= ",stype
+    #print "stype= ",stype
     if stype == "mov" or stype == "step":
         start, end, datelist = build_movstack_datelist(db)
         format = "matrix"
@@ -153,10 +153,10 @@ def main(stype, interval=1):
         #~ print datelists
 
     for f in get_filters(db, all=False):
-        print "START"
+        #print "START"
         filterid = int(f.ref)
         for components in pairs:
-            print components
+            #print components
             for station in stations:
                 sta1 = "%s_%s" % (station.split('.')[0], station.split('.')[1])
                 sta2 = sta1
@@ -170,14 +170,14 @@ def main(stype, interval=1):
                     #~ print updated_days
                     nstack, stack_total = get_results(
                         db, sta1, sta2, filterid, components, datelist, format=format)
-                    print 'nstack %s' %(nstack)
+                    #print 'nstack %s' %(nstack)
                     if nstack > 0:
                         if stype == "mov":
                             for i, date in enumerate(datelist):
                                 print date
                                 jobadded = False
                                 for mov_stack in mov_stacks:
-                                    print 'IN mov_stack! ', mov_stack
+                                    #print 'IN mov_stack! ', mov_stack
                                     if i < mov_stack:
                                         low = 0
                                         high = mov_stack

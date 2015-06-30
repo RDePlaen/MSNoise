@@ -325,7 +325,7 @@ def main():
                 #assign trames according to pair
 
                 station_to_analyse=np.where(stations==station)
-                print "you are looking for ",station_to_analyse
+                #print "you are looking for ",station_to_analyse
 
 
 
@@ -341,7 +341,7 @@ def main():
                     tr2=tramef_E[station_to_analyse]
                 elif pair.split(':')[1]=='N':
                     tr2=tramef_N[station_to_analyse]
-                print "tr1 est de type ",type(tr1)
+                #print "tr1 est de type ",type(tr1)
 
                 trames=np.vstack((tr1,tr2))
 

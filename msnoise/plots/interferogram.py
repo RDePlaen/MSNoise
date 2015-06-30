@@ -34,8 +34,13 @@ from ..api import *
 
 def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None):
     db = connect()
+    autocorr=get_config(db,'autocorr', isbool=True)
     components_to_compute = get_components_to_compute(db)
     maxlag = float(get_config(db,'maxlag'))
+    if autocorr:
+        minlag=0
+    else:
+        minlag=-maxlag
     cc_sampling_rate = float(get_config(db,'cc_sampling_rate'))
     start, end, datelist = build_movstack_datelist(db)
     # mov_stack = get_config(db,"mov_stack")
@@ -44,7 +49,7 @@ def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None)
     plt.figure(figsize=(16,16))
     sta1 = sta1.replace('.','_')
     sta2 = sta2.replace('.','_')
-    if sta2 > sta1: # alphabetical order filtering!
+    if sta2 >= sta1: # alphabetical order filtering!
         pair = "%s:%s"%(sta1,sta2)
         
         print "New Data for %s-%s-%i-%i"%(pair,components,filterid, mov_stack)
@@ -71,7 +76,7 @@ def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None)
         # ax.xaxis.set_minor_formatter(  DateFormatter('%Y-%m-%d') )
         
         lag = 120
-        plt.ylim(-lag,lag)
+        plt.ylim(minlag,lag)
         plt.title('%s : %s'%(sta1,sta2))
         name = '%i.%s_%s.png'%(filterid,sta1,sta2)
 
