@@ -37,7 +37,12 @@ from ..api import *
 def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
          show=False, outfile=None):
     db = connect()
+    autocorr=get_config(db,'autocorr', isbool=True)
     maxlag = float(get_config(db,'maxlag'))
+    if autocorr:
+        minlag=0
+    else:
+        minlag=-maxlag
     samples = get_maxlag_samples(db)
     cc_sampling_rate = float(get_config(db,'cc_sampling_rate'))
     start, end, datelist = build_movstack_datelist(db)
@@ -47,7 +52,7 @@ def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
     sta2 = sta2.replace('.','_')
     t = np.arange(samples)/cc_sampling_rate - maxlag
 
-    if sta2 > sta1: # alphabetical order filtering!
+    if sta2 >= sta1: # alphabetical order filtering!
         pair = "%s:%s"%(sta1,sta2)
         
         print "New Data for %s-%s-%i-%i"%(pair,components,filterid, mov_stack)
@@ -68,7 +73,7 @@ def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
         plt.title('%s : %s'%(sta1.replace('_', '.'), sta2.replace('_', '.')))
         plt.scatter(0,[start,])
         plt.ylim(start, end)
-        plt.xlim(-maxlag, maxlag)
+        plt.xlim(minlag, maxlag)
         ax.fmt_ydata = mdates.DateFormatter('%Y-%m-%d')
         Cursor(ax, useblit=True, color='red', linewidth=1.2)
 
