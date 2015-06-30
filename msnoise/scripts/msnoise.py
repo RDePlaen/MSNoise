@@ -166,6 +166,20 @@ def new_jobs(init):
     from ..s02new_jobs import main
     main(init)
 
+@click.command()
+@click.option('-i', '--init', is_flag=True, help='First run ?')
+def newAC_jobs(init):
+    """Determines if new AC jobs are to be defined"""
+    from ..s023newAC_jobs import main
+    main(init)
+
+
+@click.command()
+@click.option('-i', '--init', is_flag=True, help='First run ?')
+def newSC_jobs(init):
+    """Determines if new SC jobs are to be defined"""
+    from ..s022newSC_jobs import main
+    main(init)
 
 @click.command()
 def compute_cc():
