@@ -153,7 +153,7 @@ def main(interval=1):
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
 
-    logging.info('*** Starting: Compute DT/T ***')
+    logging.info('*** Starting: Compute DT/T for AC***')
     db = connect()
     
     dtt_lag = get_config(db, "dtt_lag")

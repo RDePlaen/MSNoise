@@ -89,7 +89,7 @@ def main(stype, interval=1):
                     datefmt='%Y-%m-%d %H:%M:%S')
 
     
-    logging.debug('Starting the %s stack' % stype)
+    logging.debug('Starting the %s stack for AC' % stype)
     db = connect()
 
     ###Set list of comp pairs to compute

@@ -205,10 +205,17 @@ def compute_ac():
 @click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
 @click.option('-i', '--interval', default=1, help='Number of days before now to\
  search for modified Jobs')
-def stack(ref, mov, step, interval):
+@click.option('-sc','--sc',is_flag=True, help='Compute stack for single station cross correlation')
+@click.option('-ac','--ac',is_flag=True, help='Compute stack for auto-correlation')
+def stack(ref, mov, step, interval,sc,ac):
     """Stacks the [REF] and/or [MOV] windows"""
     click.secho('Lets STACK !', fg='green')
-    from ..s04stack import main
+    if sc:
+        from ..s042stackSC import main
+    elif ac:
+        from ..s043stackAC import main
+    else:
+        from ..s04stack import main
     if ref:
         main('ref', interval)
     if mov:
@@ -216,39 +223,6 @@ def stack(ref, mov, step, interval):
     if step:
         main('step', interval)
 
-@click.command()
-@click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
-@click.option('-m', '--mov', is_flag=True, help='Compute the MOV Stacks')
-@click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
-@click.option('-i', '--interval', default=1, help='Number of days before now to\
- search for modified Jobs')
-def stackSC(ref, mov, step, interval):
-    """Stacks the [REF] and/or [MOV] windows"""
-    click.secho('Lets STACK !', fg='green')
-    from ..s042stackSC import main
-    if ref:
-        main('ref', interval)
-    if mov:
-        main('mov', interval)
-    if step:
-        main('step', interval)
-
-@click.command()
-@click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
-@click.option('-m', '--mov', is_flag=True, help='Compute the MOV Stacks')
-@click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
-@click.option('-i', '--interval', default=1, help='Number of days before now to\
- search for modified Jobs')
-def stackAC(ref, mov, step, interval):
-    """Stacks the [REF] and/or [MOV] windows"""
-    click.secho('Lets STACK !', fg='green')
-    from ..s043stackAC import main
-    if ref:
-        main('ref', interval)
-    if mov:
-        main('mov', interval)
-    if step:
-        main('step', interval)
 
 @click.command()
 @click.option('-sc','--sc',is_flag=True, help='Compute MWCS for single station cross correlation')
@@ -455,8 +429,6 @@ cli.add_command(compute_cc)
 cli.add_command(compute_sc)
 cli.add_command(compute_ac)
 cli.add_command(stack)
-cli.add_command(stackSC)
-cli.add_command(stackAC)
 cli.add_command(compute_mwcs)
 cli.add_command(compute_stretching)
 cli.add_command(compute_dtt)

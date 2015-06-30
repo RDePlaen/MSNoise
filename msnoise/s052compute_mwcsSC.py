@@ -69,7 +69,7 @@ def main():
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
 
-    logging.info('*** Starting: Compute MWCS ***')
+    logging.info('*** Starting: Compute MWCS for SC***')
     
     db = connect()
 

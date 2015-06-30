@@ -70,7 +70,7 @@ from obspy import read
 from obspy.core import utcdatetime
 from scikits.samplerate import resample
 
-from msnoise.api import *
+from api import *
 from myCorr import myCorr
 from whiten import whiten
 
