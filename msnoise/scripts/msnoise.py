@@ -187,6 +187,17 @@ def compute_cc():
     from ..s03compute_cc import main
     main()
 
+@click.command()
+def compute_sc():
+    """Computes the SC jobs (based on the "New Jobs" identified)"""
+    from ..s032computeSC import main
+    main()
+
+@click.command()
+def compute_ac():
+    """Computes the AC jobs (based on the "New Jobs" identified)"""
+    from ..s033computeAC import main
+    main()
 
 @click.command()
 @click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
@@ -205,11 +216,51 @@ def stack(ref, mov, step, interval):
     if step:
         main('step', interval)
 
+@click.command()
+@click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
+@click.option('-m', '--mov', is_flag=True, help='Compute the MOV Stacks')
+@click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
+@click.option('-i', '--interval', default=1, help='Number of days before now to\
+ search for modified Jobs')
+def stackSC(ref, mov, step, interval):
+    """Stacks the [REF] and/or [MOV] windows"""
+    click.secho('Lets STACK !', fg='green')
+    from ..s042stackSC import main
+    if ref:
+        main('ref', interval)
+    if mov:
+        main('mov', interval)
+    if step:
+        main('step', interval)
 
 @click.command()
-def compute_mwcs():
+@click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
+@click.option('-m', '--mov', is_flag=True, help='Compute the MOV Stacks')
+@click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
+@click.option('-i', '--interval', default=1, help='Number of days before now to\
+ search for modified Jobs')
+def stackAC(ref, mov, step, interval):
+    """Stacks the [REF] and/or [MOV] windows"""
+    click.secho('Lets STACK !', fg='green')
+    from ..s043stackAC import main
+    if ref:
+        main('ref', interval)
+    if mov:
+        main('mov', interval)
+    if step:
+        main('step', interval)
+
+@click.command()
+@click.option('-sc','--sc',is_flag=True, help='Compute MWCS for single station cross correlation')
+@click.option('-ac','--ac',is_flag=True, help='Compute MWCS for auto-correlation')
+def compute_mwcs(sc,ac):
     """Computes the MWCS based on the new stacked data"""
-    from ..s05compute_mwcs import main
+    if sc:
+        from ..s052compute_mwcsSC import main
+    elif ac:
+        from ..s053compute_mwcsAC import main
+    else:
+        from ..s05compute_mwcs import main
     main()
 
 
@@ -223,9 +274,16 @@ def compute_stretching():
 @click.command()
 @click.option('-i', '--interval', default=1, help='Number of days before now to\
  search for modified Jobs')
-def compute_dtt(interval):
+@click.option('-sc','--sc',is_flag=True, help='Compute dtt for single station cross correlation')
+@click.option('-ac','--ac',is_flag=True, help='Compute dtt for auto-correlation')
+def compute_dtt(interval,sc,ac):
     """Computes the dt/t jobs based on the new MWCS data"""
-    from ..s06compute_dtt import main
+    if sc:
+        from ..s062compute_dttSC import main
+    elif ac:
+        from ..s063compute_dttSA import main
+    else:
+        from ..s06compute_dtt import main
     main(interval)
 
 
@@ -391,8 +449,14 @@ cli.add_command(populate)
 cli.add_command(bugreport)
 cli.add_command(scan_archive)
 cli.add_command(new_jobs)
+cli.add_command(newAC_jobs)
+cli.add_command(newSC_jobs)
 cli.add_command(compute_cc)
+cli.add_command(compute_sc)
+cli.add_command(compute_ac)
 cli.add_command(stack)
+cli.add_command(stackSC)
+cli.add_command(stackAC)
 cli.add_command(compute_mwcs)
 cli.add_command(compute_stretching)
 cli.add_command(compute_dtt)
