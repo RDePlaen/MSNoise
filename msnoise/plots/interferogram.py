@@ -75,8 +75,8 @@ def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None)
         # ax.xaxis.set_minor_locator( MonthLocator(interval=2) )
         # ax.xaxis.set_minor_formatter(  DateFormatter('%Y-%m-%d') )
         
-        lag = 120
-        plt.ylim(minlag,lag)
+        #lag = 120
+        plt.ylim(minlag,maxlag)
         plt.title('%s : %s'%(sta1,sta2))
         name = '%i.%s_%s.png'%(filterid,sta1,sta2)
 
