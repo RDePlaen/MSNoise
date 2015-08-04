@@ -35,10 +35,14 @@ from ..api import *
 
 
 def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
-         show=False, outfile=None):
+         show=False, outfile=None, maxlag=None):
     db = connect()
     autocorr=get_config(db,'autocorr', isbool=True)
-    maxlag = float(get_config(db,'maxlag'))
+    #try:
+    #    maxlag
+    #except NameError:
+    if maxlag==None:
+        maxlag = float(get_config(db,'maxlag'))
     if autocorr:
         minlag=0
     else:

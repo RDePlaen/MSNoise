@@ -307,8 +307,6 @@ def main():
             ends.append(int(i * params.goal_sampling_rate + params.min30))
             i += int(params.min30 / params.goal_sampling_rate * (1.0 - params.overlap))
         slices = len(begins)
-
-
         # ##########################################################################################################
 
         for station in stations:

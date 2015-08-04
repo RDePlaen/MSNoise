@@ -353,12 +353,13 @@ def interferogram(sta1, sta2, filterid, comp, mov_stack, show, outfile):
               default=True, type=bool)
 @click.option('-o', '--outfile', help='Output filename (?=auto)',
               default=None, type=str)
+@click.option('-l', '--maxlag', help='Set maxlag manually', default=None, type=float)
 def ccftime(sta1, sta2, filterid, comp, mov_stack,
-            ampli, seismic, show, outfile):
+            ampli, seismic, show, outfile, maxlag):
     """Plots the ccf vs time between sta1 and sta2 (parses the dt/t results)\n
     STA1 and STA2 must be provided with this format: NET.STA !"""
     from ..plots.ccftime import main
-    main(sta1, sta2, filterid, comp, mov_stack, ampli, seismic, show, outfile)
+    main(sta1, sta2, filterid, comp, mov_stack, ampli, seismic, show, outfile, maxlag)
 
 
 @click.command()
