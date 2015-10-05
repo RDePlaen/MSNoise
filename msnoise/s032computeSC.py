@@ -254,6 +254,10 @@ def main():
                 else:
                     pairs = np.vstack((pairs,':'.join([comp, newcomp])))
     pairs = np.hstack(pairs)
+    #components_to_compute = ['ZE', 'NE', 'ZN']
+    #pairs=components_to_compute
+
+
     #for station_unique in stations_to_analyse:
     while is_next_job(db, jobtype='SC'):
         jobs = get_next_job(db, jobtype='SC')
@@ -338,6 +342,10 @@ def main():
                     tr2=tramef_E[station_to_analyse]
                 elif pair.split(':')[1]=='N':
                     tr2=tramef_N[station_to_analyse]
+                if np.all(tr1 == 0) or np.all(tr2 == 0):
+                    logging.debug("%s contains empty trace(s), skipping"%components)
+                    continue
+
                 #print "tr1 est de type ",type(tr1)
                 if np.all(tr1 == 0) or np.all(tr2 == 0):
                     logging.debug("%s contains empty trace(s), skipping"%components)

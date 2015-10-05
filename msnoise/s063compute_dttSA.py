@@ -148,7 +148,7 @@ def wavg_wstd(data, errors):
     return wavg, wstd
 
 
-def main(interval=1):
+def main(interval=1, comps=None):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -174,17 +174,10 @@ def main(interval=1):
         mov_stacks = [int(mi) for mi in mov_stack.split(',')]
 
     ###Set list of comp pairs to compute
-    components_to_compute = ['Z', 'E', 'N']
-    i = 0
-    for comp in components_to_compute:
-        for newcomp in components_to_compute:
-            if comp == newcomp:
-                if i == 0:
-                    pairs = np.array(([comp+newcomp]))
-                    i+=1
-                else:
-                    pairs = np.vstack((pairs,([comp+newcomp])))
-    components_to_compute = np.hstack(pairs)
+    if comps==None:
+        components_to_compute = ['ZE', 'NE', 'ZN']
+    else:
+        components_to_compute = [comps]
     ###
     stations = ["%s.%s" % (sta.net, sta.sta) for sta in get_stations(db, all=False)]#extract stations list
     updated_dtt = updated_days_for_dates(

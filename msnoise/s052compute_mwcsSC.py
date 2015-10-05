@@ -64,7 +64,7 @@ from MWCS import mwcs
 import logging
 
 
-def main():
+def main(comps=None):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -74,19 +74,10 @@ def main():
     db = connect()
 
     ###Set list of comp pairs to compute
-    components_to_compute = ['Z', 'E', 'N']
-    i = 0
-    for comp in components_to_compute:
-        for newcomp in components_to_compute:
-            if comp != newcomp:
-                if i == 0:
-                    pairs = np.array(([comp+newcomp]))
-                    i+=1
-                else:
-                    pairs = np.vstack((pairs,([comp+newcomp])))
-    components_to_compute = np.hstack(pairs)
-    ###
-
+    if comps==None:
+        components_to_compute = ['ZE', 'NE', 'ZN']
+    else:
+        components_to_compute = [comps]
     stations = ["%s.%s" % (sta.net, sta.sta) for sta in get_stations(db, all=False)]#extract stations list
 
     mov_stack = get_config(db, "mov_stack")

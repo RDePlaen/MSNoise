@@ -32,11 +32,13 @@ from obspy.core import read, Stream, Trace
 from ..api import *
 
 
-def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None):
+def main(sta1, sta2, filterid, components, mov_stack=1, show=True, outfile=None, maxlag=None):
     db = connect()
     autocorr=get_config(db,'autocorr', isbool=True)
-    components_to_compute = get_components_to_compute(db)
-    maxlag = float(get_config(db,'maxlag'))
+    if maxlag==None:
+        maxlag = float(get_config(db,'maxlag'))
+    #components_to_compute = get_components_to_compute(db)
+    #maxlag = float(get_config(db,'maxlag'))
     if autocorr:
         minlag=0
     else:
