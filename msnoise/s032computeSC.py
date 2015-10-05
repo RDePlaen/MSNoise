@@ -247,7 +247,7 @@ def main():
     i = 0
     for comp in params.components_to_compute:
         for newcomp in params.components_to_compute:
-            if comp != newcomp:
+            if comp != newcomp and comp > newcomp:
                 if i == 0:
                     pairs = np.array(':'.join([comp, newcomp]))
                     i+=1
@@ -311,7 +311,7 @@ def main():
         for station in stations:
             orig_pair = station
             for pair in pairs:
-                print "Processing pair %s for station %s" %(pair, station)
+                print "Processing pair %s for station %s - %s" %(pair, station, goal_day)
                 logging.info('Processing pair: %s' % pair)
                 #print type(tramef_Z)
                 #print tramef_Z.keys()
@@ -339,12 +339,14 @@ def main():
                 elif pair.split(':')[1]=='N':
                     tr2=tramef_N[station_to_analyse]
                 #print "tr1 est de type ",type(tr1)
-
+                if np.all(tr1 == 0) or np.all(tr2 == 0):
+                    logging.debug("%s contains empty trace(s), skipping"%components)
+                    continue
                 trames=np.vstack((tr1,tr2))
 
 #                print tr1
 #                print tr2
-
+                #print np.std(tr1, axis=1), np.std(tr2, axis=1)
                 del tr1,tr2
 
                 ## islice
@@ -355,12 +357,12 @@ def main():
                     filterid = filterdb.ref
                     daycorr[filterid] = np.zeros(get_maxlag_samples(db,))
                     ndaycorr[filterid] = 0
-
+                baddata=False
                 for islice, (begin, end) in enumerate(zip(begins, ends)):
                     #print "Progress: %#2d/%2d"% (islice+1,slices)
                     trame2h = trames[:, begin:end]
-
-                    rmsmat = np.std(np.abs(trame2h), axis=1)
+                    #print "Here comes the TRACES!! \n",trames
+                    rmsmat = np.std(trame2h, axis=1)
                     for filterdb in get_filters(db, all=False):
                         filterid = filterdb.ref
                         low = float(filterdb.low)
@@ -403,7 +405,7 @@ def main():
                             thistime = time.strftime("%Y-%m-%d %H:%M:%S",
                                                      tmptime)
                             if params.keep_all:
-                                ccfid = "%s_%s_%s_%s_%s" % (station,
+                                ccfid = "%s_%s_%s_%s_%s" % (station,station,
                                                          filterid, components,
                                                          thisdate)
                                 if ccfid not in allcorr:
@@ -419,7 +421,18 @@ def main():
 
                             del corr, thistime, trames2hWb
                         else:
-                            print "NOOOOOOOOOOO! Zeros!"
+                            #print "NOOOOOOOOOOO! Zeros!"
+                            baddata=True
+                            #raw_input()
+                if baddata==True:
+                    print "Bad data: ",pair, station, goal_day
+                    badfolder=os.path.join("BAD","%s"%(station))
+                    output=np.array([station, pair, goal_day])
+                    if not os.path.isdir(badfolder):
+                        print "Creating dir for ", output
+                        os.makedirs(badfolder)
+                    badfile=os.path.join(badfolder, "%s.txt" % str(goal_day))
+                    np.savetxt(badfile, output, delimiter=';', fmt="%s")
 
                 if params.keep_all:
                     for ccfid in allcorr.keys():
