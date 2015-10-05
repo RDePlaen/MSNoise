@@ -54,7 +54,7 @@ def main(sta1, sta2, filterid, components, mov_stack=1, ampli=5, seismic=False,
     plt.figure(figsize=(16,16))
     sta1 = sta1.replace('.','_')
     sta2 = sta2.replace('.','_')
-    t = np.arange(samples)/cc_sampling_rate - maxlag
+    t = np.arange(samples)/cc_sampling_rate - float(get_config(db,'maxlag'))
 
     if sta2 >= sta1: # alphabetical order filtering!
         pair = "%s:%s"%(sta1,sta2)

@@ -227,7 +227,8 @@ def stack(ref, mov, step, interval,sc,ac):
 @click.command()
 @click.option('-sc','--sc',is_flag=True, help='Compute MWCS for single station cross correlation')
 @click.option('-ac','--ac',is_flag=True, help='Compute MWCS for auto-correlation')
-def compute_mwcs(sc,ac):
+@click.option('-c', '--comps', default=None, help='Components (ZE, ZN,...)')
+def compute_mwcs(sc,ac,comps):
     """Computes the MWCS based on the new stacked data"""
     if sc:
         from ..s052compute_mwcsSC import main
@@ -235,7 +236,7 @@ def compute_mwcs(sc,ac):
         from ..s053compute_mwcsAC import main
     else:
         from ..s05compute_mwcs import main
-    main()
+    main(comps)
 
 
 @click.command()
@@ -250,7 +251,8 @@ def compute_stretching():
  search for modified Jobs')
 @click.option('-sc','--sc',is_flag=True, help='Compute dtt for single station cross correlation')
 @click.option('-ac','--ac',is_flag=True, help='Compute dtt for auto-correlation')
-def compute_dtt(interval,sc,ac):
+@click.option('-c', '--comps', default=None, help='Components (ZE, ZN,...)')
+def compute_dtt(interval,sc,ac,comps):
     """Computes the dt/t jobs based on the new MWCS data"""
     if sc:
         from ..s062compute_dttSC import main
@@ -258,7 +260,7 @@ def compute_dtt(interval,sc,ac):
         from ..s063compute_dttSA import main
     else:
         from ..s06compute_dtt import main
-    main(interval)
+    main(interval, comps)
 
 
 @click.command()
@@ -335,11 +337,12 @@ def dvv(mov_stack, comp, dttname, filterid, pair, all, show, outfile):
               default=True, type=bool)
 @click.option('-o', '--outfile', help='Output filename (?=auto)',
               default=None, type=str)
-def interferogram(sta1, sta2, filterid, comp, mov_stack, show, outfile):
+@click.option('-l', '--maxlag', help='Set maxlag manually', default=None, type=float)
+def interferogram(sta1, sta2, filterid, comp, mov_stack, show, outfile, maxlag):
     """Plots the interferogram between sta1 and sta2 (parses the CCFs)\n
     STA1 and STA2 must be provided with this format: NET.STA !"""
     from ..plots.interferogram import main
-    main(sta1, sta2, filterid, comp, mov_stack, show, outfile)
+    main(sta1, sta2, filterid, comp, mov_stack, show, outfile, maxlag)
 
 @click.command()
 @click.argument('sta1')
