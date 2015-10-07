@@ -75,7 +75,7 @@ def main(comps=None):
 
     ###Set list of comp pairs to compute
     if comps==None:
-        components_to_compute = ['ZE', 'NE', 'ZN']
+        components_to_compute = ['ZZ', 'EE', 'NN']
     else:
         components_to_compute = [comps]
     ###
@@ -101,7 +101,7 @@ def main(comps=None):
             logging.info(
                 "We will recompute all MWCS based on the new REF for %s" % pair)
             reset_dtt_jobs(db, pair)
-            update_job(db, "REF", pair, jobtype='DTT', flag='D')#why is it updated 'D'??
+            update_job(db, "REF", pair, jobtype='DTT', flag='D')
     
     logging.debug('Ready to compute')
     # Then we compute the jobs

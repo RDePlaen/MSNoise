@@ -124,7 +124,7 @@ def main(stype, interval=1):
     
     maxlag = float(get_config(db, "maxlag"))
     cc_sampling_rate = float(get_config(db, "cc_sampling_rate"))
-    #print "stype= ",stype
+
     if stype == "mov" or stype == "step":
         start, end, datelist = build_movstack_datelist(db)
         format = "matrix"
@@ -176,7 +176,7 @@ def main(stype, interval=1):
                     if nstack > 0:
                         if stype == "mov":
                             for i, date in enumerate(datelist):
-                                print date
+                                #print date
                                 jobadded = False
                                 for mov_stack in mov_stacks:
                                     #print 'IN mov_stack! ', mov_stack

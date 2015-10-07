@@ -175,7 +175,7 @@ def main(interval=1, comps=None):
 
     ###Set list of comp pairs to compute
     if comps==None:
-        components_to_compute = ['ZE', 'NE', 'ZN']
+        components_to_compute = ['ZZ', 'EE', 'NN']
     else:
         components_to_compute = [comps]
     ###
