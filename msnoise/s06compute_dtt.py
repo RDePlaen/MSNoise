@@ -148,7 +148,7 @@ def wavg_wstd(data, errors):
     return wavg, wstd
 
 
-def main(interval=1):
+def main(interval=1, comps=None):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -172,10 +172,13 @@ def main(interval=1):
         mov_stacks = [int(mov_stack), ]
     else:
         mov_stacks = [int(mi) for mi in mov_stack.split(',')]
-    
-    components_to_compute = get_components_to_compute(db)
+    days=interval
+    if comps==None:
+        components_to_compute = get_components_to_compute(db)
+    else:
+        components_to_compute = comps
     updated_dtt = updated_days_for_dates(
-        db, start, end, '%', jobtype='DTT', returndays=True, interval=datetime.timedelta(days=interval))
+        db, start, end, '%', jobtype='DTT', returndays=True, interval=datetime.timedelta(days))
     
     for f in get_filters(db, all=False):
         filterid = int(f.ref)

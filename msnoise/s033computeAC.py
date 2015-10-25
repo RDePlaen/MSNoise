@@ -217,7 +217,7 @@ def main():
     db = connect()
     #rule out absence of filters
     if len(get_filters(db, all=False)) == 0:
-        print "NO FILTER!!"
+        #print "NO FILTER!!"
         logging.info("NO FILTERS DEFINED, exiting")
         sys.exit()
 
@@ -312,8 +312,8 @@ def main():
         for station in stations:
             orig_pair = station
             for pair in pairs:
-                print "Processing pair %s for station %s" %(pair, station)
-                logging.info('Processing pair: %s' % pair)
+                #print "Processing pair %s for station %s" %(pair, station)
+                logging.info("Processing pair %s for station %s" %(pair, station))
                 #print type(tramef_Z)
                 #print tramef_Z.keys()
                 tt = time.time()
@@ -356,7 +356,7 @@ def main():
                     filterid = filterdb.ref
                     daycorr[filterid] = np.zeros(get_maxlag_samples(db,))
                     ndaycorr[filterid] = 0
-
+                baddata=False
                 for islice, (begin, end) in enumerate(zip(begins, ends)):
                     #print "Progress: %#2d/%2d"% (islice+1,slices)
                     trame2h = trames[:, begin:end]
@@ -422,8 +422,18 @@ def main():
 
                             del corr, thistime, trames2hFT
                         else:
-                            print "NOOOOOOOOOOO! Zeros!"
-
+                            #print "NOOOOOOOOOOO! Zeros!"
+                            baddata=True
+                            #raw_input()
+                if baddata==True:
+                    logging.info("Bad data: ",pair, station, goal_day)
+                    badfolder=os.path.join("BAD","%s"%(station))
+                    output=np.array([station, pair, goal_day])
+                    if not os.path.isdir(badfolder):
+                        logging.info("Creating dir for ", output)
+                        os.makedirs(badfolder)
+                    badfile=os.path.join(badfolder, "%s.txt" % str(goal_day))
+                    np.savetxt(badfile, output, delimiter=';', fmt="%s")
                 if params.keep_all:
                     for ccfid in allcorr.keys():
                         export_allcorr(db, ccfid, allcorr[ccfid])

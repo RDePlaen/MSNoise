@@ -64,7 +64,7 @@ from MWCS import mwcs
 import logging
 
 
-def main():
+def main(comps=None):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -72,7 +72,10 @@ def main():
     logging.info('*** Starting: Compute MWCS ***')
     
     db = connect()
-    components_to_compute = get_components_to_compute(db)
+    if comps==None:
+        components_to_compute = get_components_to_compute(db)
+    else:
+        components_to_compute = comps
     
     mov_stack = get_config(db, "mov_stack")
     if mov_stack.count(',') == 0:

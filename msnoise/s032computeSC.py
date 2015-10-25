@@ -315,8 +315,8 @@ def main():
         for station in stations:
             orig_pair = station
             for pair in pairs:
-                print "Processing pair %s for station %s - %s" %(pair, station, goal_day)
-                logging.info('Processing pair: %s' % pair)
+                #print "Processing pair %s for station %s - %s" %(pair, station, goal_day)
+                logging.info("Processing pair %s for station %s - %s" %(pair, station, goal_day))
                 #print type(tramef_Z)
                 #print tramef_Z.keys()
                 tt = time.time()
@@ -433,11 +433,11 @@ def main():
                             baddata=True
                             #raw_input()
                 if baddata==True:
-                    print "Bad data: ",pair, station, goal_day
+                    logging.info("Bad data: ",pair, station, goal_day)
                     badfolder=os.path.join("BAD","%s"%(station))
                     output=np.array([station, pair, goal_day])
                     if not os.path.isdir(badfolder):
-                        print "Creating dir for ", output
+                        logging.info("Creating dir for ", output)
                         os.makedirs(badfolder)
                     badfile=os.path.join(badfolder, "%s.txt" % str(goal_day))
                     np.savetxt(badfile, output, delimiter=';', fmt="%s")
