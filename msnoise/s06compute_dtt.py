@@ -158,6 +158,10 @@ def main(interval=1):
     
     dtt_lag = get_config(db, "dtt_lag")
     dtt_v = float(get_config(db, "dtt_v"))
+
+    dtt_p = float(get_config(db, "dtt_p"))
+    dtt_p_width = float(get_config(db, "dtt_p_width"))
+
     dtt_minlag = float(get_config(db, "dtt_minlag"))
     dtt_width = float(get_config(db, "dtt_width"))
     dtt_sides = get_config(db, "dtt_sides")
@@ -179,6 +183,7 @@ def main(interval=1):
     
     for f in get_filters(db, all=False):
         filterid = int(f.ref)
+        periods = float(f.low)
         for components in components_to_compute:
             for mov_stack in mov_stacks:
                 logging.info('Loading mov=%i days for filter=%02i' %
@@ -204,11 +209,18 @@ def main(interval=1):
                             if dtt_lag == "static":
                                 lmlag = -dtt_minlag
                                 rmlag = dtt_minlag
+                            elif dtt_lag == "periods":
+                                lmlag = -periods * dtt_p
+                                rmlag = periods * dtt_p
+                                lMlag = lmlag - (dtt_p_width*periods)
+                                rMlag = rmlag + (dtt_p_width*periods)
+
                             else:
                                 lmlag = -dist / dtt_v
                                 rmlag = dist / dtt_v
-                            lMlag = lmlag - dtt_width
-                            rMlag = rmlag + dtt_width
+                            if dtt_lag!="periods":
+                                lMlag = lmlag - dtt_width
+                                rMlag = rmlag + dtt_width
 
                             if dtt_sides == "both":
                                 tindex = np.where(((tArray >= lMlag) & (tArray <= lmlag)) | ((tArray >= rmlag) & (tArray <= rMlag)))[0]
