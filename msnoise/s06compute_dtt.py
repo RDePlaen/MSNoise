@@ -186,7 +186,8 @@ def main(interval=1, comps=None):
     
     for f in get_filters(db, all=False):
         filterid = int(f.ref)
-        periods = float(f.low)
+        periods = 1./float(f.low)
+
         for components in components_to_compute:
             for mov_stack in mov_stacks:
                 logging.info('Loading mov=%i days for filter=%02i' %
@@ -217,13 +218,14 @@ def main(interval=1, comps=None):
                                 rmlag = periods * dtt_p
                                 lMlag = lmlag - (dtt_p_width*periods)
                                 rMlag = rmlag + (dtt_p_width*periods)
-
+                                logging.info('periods = %s'%(dtt_lag))
                             else:
                                 lmlag = -dist / dtt_v
                                 rmlag = dist / dtt_v
                             if dtt_lag!="periods":
                                 lMlag = lmlag - dtt_width
                                 rMlag = rmlag + dtt_width
+                                logging.info('not periods')
 
                             if dtt_sides == "both":
                                 tindex = np.where(((tArray >= lMlag) & (tArray <= lmlag)) | ((tArray >= rmlag) & (tArray <= rMlag)))[0]
@@ -235,8 +237,9 @@ def main(interval=1, comps=None):
                             tmp = np.setdiff1d(np.arange(len(tArray)),tindex)
                             df['err'][tmp] = 1.0
                             df['coh'][tmp] = 0.0
-                            
+                            print lmlag, lMlag, rmlag, rMlag
                             if first:
+                                print 'first'
                                 tArray = df.index.values
                                 dtArray = df['dt']
                                 errArray = df['err']
@@ -244,6 +247,7 @@ def main(interval=1, comps=None):
                                 pairArray = [pair, ]
                                 first = False
                             else:
+                                print "not first!!!"
                                 dtArray = np.vstack((dtArray, df['dt']))
                                 errArray = np.vstack((errArray, df['err']))
                                 cohArray = np.vstack((cohArray, df['coh']))
@@ -254,7 +258,7 @@ def main(interval=1, comps=None):
                     if not first:
                         #~ tindex = np.tindwhere(((tArray >= lMlag) & (tArray <= lmlag)) | (
                             #~ (tArray >= rmlag) & (tArray <= rMlag)))[0]
-    
+                        print "not first any more"
                         Dates = []
                         Pairs = []
                         M = []
@@ -263,6 +267,9 @@ def main(interval=1, comps=None):
                         EA = []
                         M0 = []
                         EM0 = []
+
+                        print "len pair array = ", len(pairArray)
+
                         if len(pairArray) != 1:
                             # first stack all pairs to a ALL mean pair, using
                             # indexes of selected values:
@@ -342,6 +349,7 @@ def main(interval=1, comps=None):
     
                         # then process all pairs + the ALL
                         if len(dtArray.shape) == 1:  # if there is only one pair:
+                            print "only one pair"
                             dtArray = dtArray.reshape((1, dtArray.shape[0]))
                             cohArray = cohArray.reshape((1, cohArray.shape[0]))
                             errArray = errArray.reshape((1, errArray.shape[0]))
@@ -364,6 +372,7 @@ def main(interval=1, comps=None):
                             VecXfilt = tArray[index]
                             VecYfilt = dtArray[i][index]
                             if len(VecYfilt) >= 2:
+                                print "IN 1!!!"
                                 B = sm.tools.tools.add_constant(
                                     VecXfilt, prepend=False)
                                 res = sm.regression.linear_model.WLS(
@@ -371,6 +380,7 @@ def main(interval=1, comps=None):
                                 res0 = sm.regression.linear_model.WLS(
                                     VecYfilt, VecXfilt, w).fit()
                                 if res.df_resid > 0:
+                                    print "IN 2!!!"
                                     m, a = res.params
                                     em, ea = res.bse
     
@@ -389,6 +399,8 @@ def main(interval=1, comps=None):
                                     Pairs.append(pair)
     
                                     del m, a, em, ea, m0, em0
+                                else:
+                                    print res.df_resid
                                 del res, res0, B
                             del VecXfilt, VecYfilt, w
                             del index, cohindex, errindex, dtindex
@@ -397,6 +409,7 @@ def main(interval=1, comps=None):
                             "%s: exporting: %i pairs" % (current, len(pairArray)))
                         df = pd.DataFrame(
                             {'Pairs': Pairs, 'M': M, 'EM': EM, 'A': A, 'EA': EA, 'M0': M0, 'EM0': EM0}, index=pd.DatetimeIndex(Dates))
+                        print df
                         # Needs to be changed !
                         output = os.path.join(
                             'DTT', "%02i" % filterid, "%03i_DAYS" % mov_stack, components)

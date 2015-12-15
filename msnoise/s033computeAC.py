@@ -66,14 +66,13 @@ To run this script:
 import time
 import calendar
 import sys
-from obspy import read
+
 from obspy.core import utcdatetime
 from scikits.samplerate import resample
-import scipy.fftpack
 
 from api import *
 from myCorr import myCorr
-#from whiten import whiten
+from nowhiten import nowhiten
 
 
 def preprocess(db, stations, comps, goal_day, params, tramef_Z, tramef_E=np.array([]), tramef_N=np.array([])):
@@ -201,7 +200,6 @@ def preprocess(db, stations, comps, goal_day, params, tramef_Z, tramef_E=np.arra
     else:
         return basetime, tramef_Z
 
-
 class Params():
     pass
 
@@ -217,7 +215,6 @@ def main():
     db = connect()
     #rule out absence of filters
     if len(get_filters(db, all=False)) == 0:
-        #print "NO FILTER!!"
         logging.info("NO FILTERS DEFINED, exiting")
         sys.exit()
 
@@ -236,7 +233,6 @@ def main():
     params.keep_all = get_config(db, 'keep_all', isbool=True)
     params.keep_days = get_config(db, 'keep_days', isbool=True)
     params.components_to_compute = ['Z', 'E', 'N']
-    ####Select here only the comps in get_data_availability
     ##################################
 
     logging.info("Will compute %s" % " ".join(params.components_to_compute))
@@ -261,7 +257,6 @@ def main():
     while is_next_job(db, jobtype='AC'):
         jobs = get_next_job(db, jobtype='AC')
         #logging.info("Working on station %s" %(station_unique))
-
         stations = []
         refs = []
 
@@ -275,7 +270,6 @@ def main():
             goal_day = job.day
 
         stations = np.unique(stations)#only 1 station in it
-        #print "only this station(s) here: %s, ref= %s" %(stations, refs)
         logging.info("New AC Job: %s (%i pairs with %i stations)" %
                      (goal_day, len(pairs)*len(stations), len(stations)))
         jt = time.time()
@@ -288,17 +282,11 @@ def main():
         tramef_E = np.zeros((len(stations), xlen))
         tramef_N = np.zeros((len(stations), xlen))
         basetime, tramef_Z, tramef_E, tramef_N = preprocess(db, stations, comps, goal_day, params, tramef_Z, tramef_E, tramef_N)# preprocessing
-        #print type(tramef_E)
 
-        # comps = ['Z']
-        # tramef_Z = np.zeros((len(stations), xlen))
-        # basetime, tramef_Z = preprocess(db, stations, comps, goal_day, params, tramef_Z)
-        # print type(tramef_Z)
+
 
         dt = 1. / params.goal_sampling_rate
         # Calculate the number of slices
-
-        slices = int(params.goal_duration * params.goal_sampling_rate / params.min30)
         begins = []
         ends = []
         i = 0
@@ -312,10 +300,7 @@ def main():
         for station in stations:
             orig_pair = station
             for pair in pairs:
-                #print "Processing pair %s for station %s" %(pair, station)
                 logging.info("Processing pair %s for station %s" %(pair, station))
-                #print type(tramef_Z)
-                #print tramef_Z.keys()
                 tt = time.time()
                 comp1,comp2=pair.split(':')
                 components=comp1+comp2
@@ -323,7 +308,6 @@ def main():
                 #assign trames according to pair
 
                 station_to_analyse=np.where(stations==station)
-                #print "you are looking for ",station_to_analyse
 
 
 
@@ -339,12 +323,8 @@ def main():
                     tr2=tramef_E[station_to_analyse]
                 elif pair.split(':')[1]=='N':
                     tr2=tramef_N[station_to_analyse]
-                #print "tr1 est de type ",type(tr1)
 
                 trames=np.vstack((tr1,tr2))
-
-#                print tr1
-#                print tr2
 
                 del tr1,tr2
 
@@ -376,7 +356,6 @@ def main():
                         trames2hFT = np.zeros((2, int(Nfft)), dtype=np.complex)
                         skip = False
                         for i, comp in enumerate(pair.split(':')):#### fix this loop, work on each comp of the pair
-                            #print i, comp, station, goal_day
                             if rmsmat[i] > rms_threshold:
                                 cp = cosTaper(len(trame2h[i]),0.04)
                                 trame2h[i] -= trame2h[i].mean()
@@ -391,7 +370,8 @@ def main():
                                         trame2h[i][indexes])) * params.windsorizing * rmsmat[i]
 
                                 #trames2hWb[i] = whiten(trame2h[i]*cp, Nfft, dt, low, high, plot=False)
-                                trames2hFT[i]=scipy.fftpack.fft(trame2h[i]*cp, Nfft)
+                                trames2hFT[i] = nowhiten(trame2h[i]*cp, Nfft, dt, low, high, plot=False)
+                                #trames2hFT[i]=scipy.fftpack.fft(trame2h[i]*cp, Nfft)
                             else:
                                 #trames2hWb[i] = np.zeros(int(Nfft))
                                 trames2hFT[i] = np.zeros(int(Nfft))
@@ -414,7 +394,6 @@ def main():
                                 allcorr[ccfid][thistime] = corr
 
                             if params.keep_days:
-                                #print "KEEP DAYS!"
                                 if not np.any(np.isnan(corr)) and \
                                         not np.any(np.isinf(corr)):
                                     daycorr[filterid] += corr
@@ -422,9 +401,7 @@ def main():
 
                             del corr, thistime, trames2hFT
                         else:
-                            #print "NOOOOOOOOOOO! Zeros!"
                             baddata=True
-                            #raw_input()
                 if baddata==True:
                     logging.info("Bad data: ",pair, station, goal_day)
                     badfolder=os.path.join("BAD","%s"%(station))
