@@ -1,0 +1,131 @@
+DATE:
+=====
+Sep 2015
+
+Corr_stack_v03:
+===============
+Here are scripts and programs to cross-correlate and
+stack your noise data using instantaneous phase coherence.
+This directory is not yet complete. I quickly wrote
+some program descriptions and prepared some examples
+just to show how to use the programs. In a near future 
+I will improve the program descriptions, prepare some
+better examples, improve the speed of the programs, ... . 
+
+Compile programs:
+=================
+I use ifort from Intel or gfortran, other compiler should 
+work equally well.
+(1) Edit makefile (adapt the path to the sac library, ...). 
+(2) Compilation of programs: (just type "make name_program")
+make pcc5g 
+make norm_tavg_white
+make tf_pws0
+
+How to use the programs?
+========================
+Just execute each program without any argument
+and a small man-page will be prompted on your screen.
+
+How to start?
+==============
+I remove the instrument response, mean and trend before
+applying PCC to my data. I also synchronize the begin
+times of the traces. 
+
+The script "do_cpair.cmd" handles the cross-correlations
+and the stacking of the cross-correlograms. You will need
+to adapt the script for your own purposes/data/needs/...
+At least, it can show you a possible work flow.
+
+Note, my script uses the command "tail". It seems that
+there exist different "tail" versions with different syntax 
+(tail +n rather than tail -n). I.e., you may need to adapt the script.
+
+Further, there are 2 examples which show you how to 
+cross-correlate and how to stack the resulting cross-
+correlations. The directories with the examples are called
+Example_pcc5g and Example_tf_pws0, respectively.
+Example_pcc5g/do_corr_TA.cmd and Example_tf_pws0/do_tf_pws0.cmd
+are scripts which you can directly use to cross-correlate or
+stack the test data. Play with the examples to get a feeling
+for the programs and adapt the scripts to your needs and data. 
+Good luck!
+
+Simple test stacking some data:
+===============================
+(1) List the SAC data you want to stack into one file:
+ls -1 mydata.sac > mytest.in
+(2) Execute program with default settings:
+tf_pws0 mytest.in
+(3) Compare linear stack with tf-pws:
+SAC> r tl.sac tf-pws.sac
+SAC> p1
+...
+
+Further remarks:
+================
+(1) The programs are not very efficient when working with a 
+large amount of data and need improvements for faster 
+computations. Computation speed depends mainly on number
+of data samples and lag range.
+(2) Remember (see publication) that I do not use any
+time-domain or frequency domain normalization
+of the data when working with the PCC. norm_tavg_white.f
+is provided only for your convenience and ccgn.  
+
+Last changes:
+=============
+Mar 2014:
+pcc5f.f ==> pcc5g.f (change ccgn routine)
+Abr 2015:
+tf_pws0.f ==> avoid NaN traces on input.
+Sep 2015:
+Started with some general cleaning. 
+Feb 2016:
+tf_pws0.f ==> normalization
+
+LAST BUT NOT LEAST:
+===================
+Thanks for your interest in using these programs.
+As usual, my scripts and programs are distributed in the hope 
+that they will be useful without any warranties. So, use them 
+on your own risk for your research purposes. 
+Please, report bugs/problems/... .  Also, if you need any 
+help, if you improved the program, if you have nice results, or 
+if ...  then please do not hesitate to contact me. Any feed 
+back can help me for future releases. 
+
+If this program has helped you in your research then 
+please refer to the main or corresponding publication. Thanks.
+
+AUTHOR: 
+=======
+Martin Schimmel (schimmel@ictja.csic.es)
+
+MAIN REFERENCE for noise processing/application:
+=================================================
+Schimmel, M., Stutzmann, E., Gallart, J., Using instantaneous phase 
+coherence for signal extraction from ambient noise data at a local 
+to a global scale, Geophys. J. Int., doi: 10.1111/j.1365-246X.2010.04861.x
+
+References for further readings on individual processing steps:
+===============================================================
+*** Phase cross-correlation (PCC): 
+Schimmel M., Phase cross-correlations: design, comparisons and 
+applications, Bull. Seismol. Soc. Am., 89, 1366-1378, 1999.
+
+*** tf-domain phase weighted stack (tf-pws):
+Schimmel M., and J. Gallart, Frequency-dependent phase coherence for 
+noise suppression in seismic array data, J. Geophys. Res., 112, B04303, 
+doi:10.1029/2006JB004680, 2007.
+
+*** inverse S-transform:
+Schimmel M., and J. Gallart, The inverse S Transform in filters with 
+time-frequency localization, IEEE Transactions on Signal Processing, 
+53 (11), 4417 - 4422, doi:10.1109/TSP.2005.857065, 2005.
+
+*** Time domain phase weighted stack:
+Schimmel M. and H. Paulssen,  Noise reduction and detection of weak, 
+coherent signals through phase weighted stacks, Geophys. J. Int., 
+130, 497-505, doi:10.1111/j.1365-246X.1997.tb05664.x, 1997.
