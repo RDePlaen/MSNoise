@@ -169,12 +169,12 @@ class Params():
     pass
 
 
-def main():
+def main(jobtype = 'AC'):
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
 
-    logging.info('*** Starting: Compute AC ***')
+    logging.info('*** Starting: Compute PCC ***')
 
     # Connection to the DB
     db = connect()
@@ -214,19 +214,31 @@ def main():
     ##################################
     #modified part to make pair list with comps
     ##################################
-    i = 0
-    for comp in params.components_to_compute:
-        for newcomp in params.components_to_compute:
-            if comp == newcomp:
-                if i == 0:
-                    pairs = np.array(':'.join([comp, newcomp]))
-                    i+=1
-                else:
-                    pairs = np.vstack((pairs,':'.join([comp, newcomp])))
+    if jobtype=='AC':
+        i = 0
+        for comp in params.components_to_compute:
+            for newcomp in params.components_to_compute:
+                if comp == newcomp:
+                    if i == 0:
+                        pairs = np.array(':'.join([comp, newcomp]))
+                        i+=1
+                    else:
+                        pairs = np.vstack((pairs,':'.join([comp, newcomp])))
+    elif jobtype=='SC':
+        i = 0
+        for comp in params.components_to_compute:
+            for newcomp in params.components_to_compute:
+                if comp != newcomp and comp > newcomp:
+                    if i == 0:
+                        pairs = np.array(':'.join([comp, newcomp]))
+                        i+=1
+                    else:
+                        pairs = np.vstack((pairs,':'.join([comp, newcomp])))
+
     pairs = np.hstack(pairs)
     print('Pairs = ', len(pairs))
-    while is_next_job(db, jobtype='AC'):
-        jobs = get_next_job(db, jobtype='AC')
+    while is_next_job(db, jobtype=jobtype):
+        jobs = get_next_job(db, jobtype=jobtype)
         stations = []
         #Raph pairs = []
         refs = []
@@ -253,8 +265,8 @@ def main():
 
         stations = np.unique(stations)
 
-        logging.info("New AC Job: %s (%i stations with %i pairs each)" %
-                     (goal_day , len(stations), len(pairs)))
+        logging.info("New %s Job: %s (%i stations with %i pairs each)" %
+                     (jobtype, goal_day , len(stations), len(pairs)))
         jt = time.time()
 
         xlen = int(params.goal_duration * params.goal_sampling_rate)
@@ -411,7 +423,7 @@ def main():
                                 ncorr=corrs.shape[0])
                 del trames, daycorr, ndaycorr
             logging.debug("Updating Job")
-            update_job(db, goal_day, orig_pair, 'AC', 'D')
+            update_job(db, goal_day, orig_pair, jobtype, 'D')
 
             logging.info("Finished processing this pair. It took %.2f seconds" % (time.time() - tt))
         logging.info("Job Finished. It took %.2f seconds" % (time.time() - jt))
