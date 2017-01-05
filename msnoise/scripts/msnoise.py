@@ -409,6 +409,31 @@ def compute_ac(ctx, pcc, pxc):
 
 
 @click.command()
+@click.option('-ac', '--autocorr', is_flag=True, help='Compute the Auto-Correlation')
+@click.option('-sc', '--singlestation', is_flag=True, help='Compute the Auto-Correlation')
+@click.pass_context
+def compute_pcc(ctx, ac, sc):
+    """Computes the AC jobs with PCC (based on the "New Jobs" identified)"""
+    from ..s034compute_pcc import main
+    click.secho('Using PCC - Schimmel style', fg='green')
+    if ac:
+        jobtype = 'AC'
+    elif sc:
+        jobtype = 'SC'
+
+    from multiprocessing import Process
+    threads = ctx.obj['MSNOISE_threads']
+    processes = []
+    for i in range(threads):
+        p = Process(target=main(jobtype))
+        p.start()
+        processes.append(p)
+        time.sleep(1)
+    for p in processes:
+        p.join()
+
+
+@click.command()
 @click.option('-r', '--ref', is_flag=True, help='Compute the REF Stack')
 @click.option('-m', '--mov', is_flag=True, help='Compute the MOV Stacks')
 @click.option('-s', '--step', is_flag=True, help='Compute the STEP Stacks')
@@ -735,6 +760,7 @@ cli.add_command(newSC_jobs)
 cli.add_command(compute_cc)
 cli.add_command(compute_sc)
 cli.add_command(compute_ac)
+cli.add_command(compute_pcc)
 cli.add_command(stack)
 cli.add_command(compute_mwcs)
 cli.add_command(compute_stretching)
